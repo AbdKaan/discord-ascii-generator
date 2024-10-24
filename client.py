@@ -31,6 +31,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# Sync function/command from https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html
 @bot.command()
 @commands.guild_only()
 @commands.is_owner()
@@ -68,8 +69,14 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
 @app_commands.allowed_installs(guilds=True, users=True) # users only, no guilds for install
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True) # all allowed
 async def image_to_ascii(interaction: discord.Interaction, format: str, image: discord.Attachment):
+    await interaction.response.defer()
+    # save the image so we can process it
     await image.save('image.png')
-    ascii = img_to_ascii('image.png', 24)
+
+    # turn into ascii
+    ascii = img_to_ascii('image.png')
+
+    # send the message
     await interaction.followup.send(ascii)
 
 bot.run(token)
