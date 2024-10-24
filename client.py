@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from typing import Literal, Optional
 from SECRET import token 
-
+from image_converter import image_to_ascii as img_to_ascii
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -65,9 +65,11 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 @bot.tree.command()
-@app_commands.allowed_installs(guilds=False, users=True) # users only, no guilds for install
+@app_commands.allowed_installs(guilds=True, users=True) # users only, no guilds for install
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True) # all allowed
-async def image_to_ascii(interaction: discord.Interaction, arg: str):
-    await interaction.response.send_message(f"Given argument: {arg}")
+async def image_to_ascii(interaction: discord.Interaction, format: str, image: discord.Attachment):
+    await image.save('image.png')
+    ascii = img_to_ascii('image.png', 24)
+    await interaction.followup.send(ascii)
 
 bot.run(token)
