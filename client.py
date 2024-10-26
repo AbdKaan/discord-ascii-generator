@@ -6,6 +6,7 @@ from typing import Literal, Optional
 from SECRET import token 
 from image_converter import image_to_ascii as img_to_ascii
 
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -73,10 +74,29 @@ async def image_to_ascii(interaction: discord.Interaction, format: str, image: d
     # save the image so we can process it
     await image.save('image.png')
 
-    # turn into ascii
-    ascii = img_to_ascii('image.png')
+    # check if format is 'file'
+    if format == "file":
+        def check(m):
+            try:
+                _ = int(m.content)
+                return m.author == interaction.user and m.channel == interaction.channel
+            except:
+                return False
 
-    # send the message
-    await interaction.followup.send(ascii)
+        await interaction.followup.send("What should the width be? (character length, example: 50)")
+        resp = await bot.wait_for("message", check=check, timeout=60.0)
+        width = int(resp.content)
+
+        ascii = img_to_ascii('image.png', width=width)
+
+        with open("ascii_art.txt", "rb") as file:
+            await interaction.followup.send(file=discord.File(file, "ascii_art.txt"))
+    elif format == "message":
+        ascii = img_to_ascii('image.png')
+
+        # send the message
+        await interaction.followup.send(ascii)
+    else:
+        await interaction.followup.send("Format needs to be 'file' or 'message'. Please try again.")
 
 bot.run(token)

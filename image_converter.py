@@ -4,21 +4,23 @@ import math
 import numpy as np
 
 
-# ASCII characters set from darkest to lightest
+# ASCII character combinations, they are sorted from darkest to lightest
 ASCII_CHARS = ['@', '#', '%', '&', '*', '=', '+', '-', ':', '.']
 #ASCII_CHARS = ['@', '#', '8', '&', 'o', ':', '*', '.', ' ']
 #ASCII_CHARS = ['@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.']
 #ASCII_CHARS = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' ']
 
 # Resize image according to a new width (to maintain aspect ratio)
-def resize_image(image):
+def resize_image(image, new_width=None):
     # Find new width and height so that number of characters won't exceed 2000
     width, height = image.size
     aspect_ratio = height / width
-    discord_msg_limit = 2000
-    used_chars = 20
-    size = discord_msg_limit - used_chars
-    new_width = int(math.sqrt(size/(aspect_ratio * 2)))
+    if new_width == None:
+        discord_msg_limit = 2000
+        used_chars = 20
+        size = discord_msg_limit - used_chars
+        new_width = int(math.sqrt(size/(aspect_ratio * 2)))
+
     new_height = int(new_width * aspect_ratio)
 
     # Multiplying width by two because a character's height takes close to twice its width's space so it doesn't look squished
@@ -43,8 +45,8 @@ def map_pixels_to_ascii(image):
     return ascii_str
 
 # Split the ASCII string into lines to match the image dimensions
-def generate_ascii_art(image):
-    image = resize_image(image)
+def generate_ascii_art(image, width=None):
+    image = resize_image(image, width)
     width, _ = image.size
 
     grayscale_img = grayscale_image(image)
@@ -56,7 +58,7 @@ def generate_ascii_art(image):
     return ascii_art
 
 # Load image and generate ASCII art
-def image_to_ascii(image_path):
+def image_to_ascii(image_path, width=None):
     try:
         if image_path:
             image = Image.open(image_path)
@@ -64,14 +66,15 @@ def image_to_ascii(image_path):
         print(f"Unable to open image: {e}")
         return e
 
-    ascii_art = generate_ascii_art(image)
+    ascii_art = generate_ascii_art(image, width)
     ascii_art = f"```\n{ascii_art}\n```"
-    print(len(ascii_art))
+
     # Save the ASCII art to a text file
     with open('ascii_art.txt', 'w') as f:
         f.write(ascii_art)
     
-    # Print the ASCII art to the console
-    print(ascii_art)
+    # Print the ASCII art to the console if it's for message format
+    if width == None:
+        print(ascii_art)
 
     return ascii_art
