@@ -5,10 +5,10 @@ import numpy as np
 
 
 # ASCII character combinations, they are sorted from darkest to lightest
-ASCII_CHARS = ['@', '#', '%', '&', '*', '=', '+', '-', ':', '.']
+#ASCII_CHARS = ['@', '#', '%', '&', '*', '=', '+', '-', ':', '.']
 #ASCII_CHARS = ['@', '#', '8', '&', 'o', ':', '*', '.', ' ']
 #ASCII_CHARS = ['@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.']
-#ASCII_CHARS = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' ']
+ASCII_CHARS = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' ']
 
 # Resize image according to a new width (to maintain aspect ratio)
 def resize_image(image, new_width=None):
@@ -26,6 +26,13 @@ def resize_image(image, new_width=None):
     # Multiplying width by two because a character's height takes close to twice its width's space so it doesn't look squished
     resized_image = image.resize((new_width * 2, new_height))
     return resized_image
+
+def handle_transparency(image):
+    # To replace transparent areas with a white background
+    background_color = (255, 255, 255, 255)  # white background
+    new_image = Image.new("RGBA", image.size, background_color)
+    new_image.paste(image, (0, 0), image)  # Paste using transparency mask
+    return new_image
 
 # Convert the image to grayscale
 def grayscale_image(image):
@@ -61,11 +68,15 @@ def generate_ascii_art(image, width=None):
 def image_to_ascii(image_path, width=None):
     try:
         if image_path:
-            image = Image.open(image_path)
+            if image_path[-3:] == "png":
+                image = Image.open(image_path).convert("RGBA")
+            else:
+                image = Image.open(image_path)
     except Exception as e:
         print(f"Unable to open image: {e}")
         return e
 
+    image = handle_transparency(image)
     ascii_art = generate_ascii_art(image, width)
     ascii_art = f"```\n{ascii_art}\n```"
 

@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from PIL import Image
 from typing import Literal, Optional
 from SECRET import token 
 from image_converter import image_to_ascii as img_to_ascii
@@ -66,13 +67,27 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+def is_valid_image(file_name):
+    try:
+        with Image.open(file_name) as img:
+            img.verify()
+            return True
+    except (IOError, SyntaxError):
+        return False
+
 @bot.tree.command()
 @app_commands.allowed_installs(guilds=True, users=True) # users only, no guilds for install
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True) # all allowed
 async def image_to_ascii(interaction: discord.Interaction, format: str, image: discord.Attachment):
     await interaction.response.defer()
+
     # save the image so we can process it
     await image.save('image.png')
+
+    # check if the file is an image
+    if not is_valid_image("image.png"):
+        await interaction.followup.send("File needs to be an image.")
+        return
 
     # check if format is 'file'
     if format == "file":
