@@ -1,5 +1,4 @@
 from PIL import Image
-from urllib.request import urlopen
 import math
 import numpy as np
 
@@ -68,15 +67,16 @@ def generate_ascii_art(image, width=None):
 def image_to_ascii(image_path, width=None):
     try:
         if image_path:
+            # Check if the image might have transparency ("png" or "gif" format has it and we dont work with gifs)
             if image_path[-3:] == "png":
                 image = Image.open(image_path).convert("RGBA")
+                image = handle_transparency(image)
             else:
                 image = Image.open(image_path)
     except Exception as e:
         print(f"Unable to open image: {e}")
         return e
 
-    image = handle_transparency(image)
     ascii_art = generate_ascii_art(image, width)
     ascii_art = f"```\n{ascii_art}\n```"
 
@@ -84,7 +84,7 @@ def image_to_ascii(image_path, width=None):
     with open('ascii_art.txt', 'w') as f:
         f.write(ascii_art)
     
-    # Print the ASCII art to the console if it's for message format
+    # Print the ASCII art to the console if it's for message format (just for some testing)
     if width == None:
         print(ascii_art)
 
