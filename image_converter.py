@@ -78,7 +78,8 @@ def image_to_ascii(image_path, width=None):
         return e
 
     ascii_art = generate_ascii_art(image, width)
-    ascii_art = f"```\n{ascii_art}\n```"
+    if width == None:
+        ascii_art = f"```\n{ascii_art}\n```"
 
     # Save the ASCII art to a text file
     with open('ascii_art.txt', 'w') as f:
