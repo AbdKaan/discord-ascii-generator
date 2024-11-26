@@ -51,3 +51,5 @@ If the format is chosen as message:
 `message` will make sure that the size of the ascii art won't exceed 2000 characters and paste it into a code field and send it to channel.
 
 `file` will prompt you for the width character size for the art then it will send the file in the channel.
+
+## 🤝 Contributing
