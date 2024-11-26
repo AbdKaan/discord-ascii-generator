@@ -1,5 +1,7 @@
 # Image to ASCII converter Discord bot
 
+A discord bot that turns images into ASCII art as a message or as a file.
+
 *Invite link*: https://discord.com/oauth2/authorize?client_id=1297538628586705008
 
 Currently it is not hosted on a server but this will be done soon.
